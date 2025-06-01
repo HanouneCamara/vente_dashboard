@@ -1,0 +1,5 @@
+flask
+pandas
+matplotlib
+openpyxl
+fpdf2
