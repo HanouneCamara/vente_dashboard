@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard des Ventes</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Liste des ventes</h1>
+
+    {% if ventes %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Prix Unitaire</th>
+                <th>Client</th>
+            </tr>
+            {% for vente in ventes %}
+            <tr>
+                <td>{{ vente.id }}</td>
+                <td>{{ vente.date }}</td>
+                <td>{{ vente.produit }}</td>
+                <td>{{ vente.quantite }}</td>
+                <td>{{ vente.prix_unitaire }}</td>
+                <td>{{ vente.client }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Aucune vente enregistrée.</p>
+    {% endif %}
+</body>
+</html>
