@@ -10,7 +10,6 @@
     </style>
 </head>
 <body>
-    <p><a href="{{ url_for('ajouter') }}">➕ Ajouter une vente</a></p>
     <h1>Liste des ventes</h1>
 
     {% if ventes %}
@@ -37,5 +36,6 @@
     {% else %}
         <p>Aucune vente enregistrée.</p>
     {% endif %}
+    <p><a href="{{ url_for('ajouter') }}">➕ Ajouter une vente</a></p>
 </body>
 </html>
