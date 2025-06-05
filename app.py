@@ -40,5 +40,14 @@ def ajouter():
     
     return render_template('ajouter.html')
 
+@app.route('/supprimer/<int:id>', methods=['GET', 'POST'])
+def supprimer(id):
+    conn = sqlite3.connect("db/ventes.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM ventes WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('index'))
+
 if __name__ == '__main__':
     app.run(debug=True)
