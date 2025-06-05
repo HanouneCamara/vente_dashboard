@@ -32,6 +32,7 @@
                 <td>{{ vente.prix_unitaire }}</td>
                 <td>{{ vente.client }}</td>
                 <td>
+                    <a href="{{ url_for('modifier', id=vente.id) }}">✏️</a>
                     <a href="{{ url_for('supprimer', id=vente.id) }}" onclick="return confirm('Supprimer cette vente ?');">🗑️</a>
                 </td>
             </tr>

@@ -49,5 +49,34 @@ def supprimer(id):
     conn.close()
     return redirect(url_for('index'))
 
+@app.route('/modifier/<int:id>', methods=['GET', 'POST'])
+def modifier(id):
+    conn = sqlite3.connect("db/ventes.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    if request.method == 'POST':
+        date = request.form['date']
+        produit = request.form['produit']
+        quantite = int(request.form['quantite'])
+        prix_unitaire = float(request.form['prix_unitaire'])
+        client = request.form['client']
+        
+        cursor.execute("""
+            UPDATE ventes
+            SET date = ?, produit = ?, quantite = ?, prix_unitaire = ?, client = ?
+            WHERE id = ?
+        """,(date, produit, quantite, prix_unitaire, client, id)
+        )
+        
+        conn.commit()
+        conn.close()
+        return redirect(url_for('index'))
+    cursor.execute("SELECT * FROM ventes WHERE id = ?", (id,))
+    vente = cursor.fetchone()
+    conn.close()
+    return render_template('modifier.html', vente=vente)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
