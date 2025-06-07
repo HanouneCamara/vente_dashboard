@@ -23,7 +23,6 @@
         <table class="table table-bordered table-striped table-hover">
             <thead class="table-dark text-center">
                 <tr>
-                    <th>ID</th>
                     <th>Date</th>
                     <th>Produit</th>
                     <th>Quantité</th>
@@ -35,7 +34,6 @@
             <tbody class="text-center">
                 {% for vente in ventes %}
                 <tr>
-                    <td>{{ vente.id }}</td>
                     <td>{{ vente.date }}</td>
                     <td>{{ vente.produit }}</td>
                     <td>{{ vente.quantite }}</td>
