@@ -1,30 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Ajouter une vente</title>
+
+    <!-- ✅ Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Ajouter une vente</h1>
-    <form method="POST">
-        <label>Date :</label><br>
-        <input type="date" name="date" required><br><br>
 
-        <label>Produit :</label><br>
-        <input type="text" name="produit" required><br><br>
+    <div class="container mt-5">
+        <h2 class="mb-4 text-center">➕ Ajouter une vente</h2>
 
-        <label>Quantité :</label><br>
-        <input type="number" name="quantite" required><br><br>
+        <form method="POST" action="{{ url_for('ajouter') }}" class="p-4 border rounded shadow-sm bg-light">
+            <div class="mb-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" name="date" id="date" class="form-control" required>
+            </div>
 
-        <label>Prix unitaire :</label><br>
-        <input type="number" step="0.01" name="prix_unitaire" required><br><br>
+            <div class="mb-3">
+                <label for="produit" class="form-label">Produit</label>
+                <input type="text" name="produit" id="produit" class="form-control" required>
+            </div>
 
-        <label>Client :</label><br>
-        <input type="text" name="client" required><br><br>
+            <div class="mb-3">
+                <label for="quantite" class="form-label">Quantité</label>
+                <input type="number" name="quantite" id="quantite" class="form-control" min="1" required>
+            </div>
 
-        <button type="submit">Enregistrer</button>
-    </form>
+            <div class="mb-3">
+                <label for="prix_unitaire" class="form-label">Prix unitaire</label>
+                <input type="number" step="0.01" name="prix_unitaire" id="prix_unitaire" class="form-control" required>
+            </div>
 
-    <p><a href="{{ url_for('index') }}">← Retour au tableau</a></p>
+            <div class="mb-3">
+                <label for="client" class="form-label">Client</label>
+                <input type="text" name="client" id="client" class="form-control" required>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">⬅️ Retour</a>
+                <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+            </div>
+        </form>
+    </div>
+
 </body>
 </html>
