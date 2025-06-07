@@ -3,3 +3,4 @@ pandas
 matplotlib
 openpyxl
 fpdf2
+xhtml2pdf
