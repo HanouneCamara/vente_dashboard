@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #999; padding: 5px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">Rapport des ventes</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Produit</th>
+            <th>Quantité</th>
+            <th>Prix Unitaire</th>
+            <th>Client</th>
+        </tr>
+        {% for v in ventes %}
+        <tr>
+            <td>{{ v["id"] }}</td>
+            <td>{{ v["date"] }}</td>
+            <td>{{ v["produit"] }}</td>
+            <td>{{ v["quantite"] }}</td>
+            <td>{{ v["prix_unitaire"] }}</td>
+            <td>{{ v["client"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

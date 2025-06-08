@@ -18,6 +18,11 @@
                 ➕ Ajouter une vente
             </a>
         </div>
+        <div class="mt-3">
+            📄 <a href="{{ url_for('generer_pdf') }}">Télécharger en PDF</a> |
+            📊 <a href="{{ url_for('generer_excel') }}">Télécharger en Excel</a>
+        </div>
+
 
         <!-- ✅ Tableau des ventes -->
         <table class="table table-bordered table-striped table-hover">

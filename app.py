@@ -1,5 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, make_response, send_file
 import sqlite3
+from xhtml2pdf import pisa
+from io import BytesIO
+import openpyxl
 
 app = Flask(__name__)
 
@@ -77,6 +80,40 @@ def modifier(id):
     conn.close()
     return render_template('modifier.html', vente=vente)
 
+@app.route('/reports/pdf')
+def generer_pdf():
+    ventes = get_all_ventes()
+    rendered = render_template("rapport_pdf.html", ventes=ventes)
+    
+    pdf = BytesIO()
+    pisa_status = pisa.CreatePDF(rendered, dest=pdf)
+    
+    if not pisa_status.err:
+        pdf.seek(0)
+        return send_file(pdf, mimetype='application/pdf', as_attachment=True, download_name='rapport_ventes.pdf')
+    return "Erreur lors de la génération du PDF"
+
+@app.route('/reports/excel')
+def generer_excel():
+    ventes = get_all_ventes()
+    
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Ventes"
+
+    # Entête
+    ws.append(["ID", "Date", "Produit", "Quantité", "Prix Unitaire", "Client"])
+
+    # Données
+    for v in ventes:
+        ws.append([v["id"], v["date"], v["produit"], v["quantite"], v["prix_unitaire"], v["client"]])
+
+    # Sauvegarde en mémoire
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', as_attachment=True, download_name='rapport_ventes.xlsx')
 
 if __name__ == '__main__':
     app.run(debug=True)
