@@ -16,10 +16,26 @@ def get_all_ventes():
     conn.close()
     return ventes
 
+# Fonction qui calcule les totaux
+def get_totaux():
+    conn = sqlite3.connect("db/ventes.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT SUM(quantite * prix_unitaire) FROM ventes")
+    total_ventes = cursor.fetchone()[0] or 0
+    
+    cursor.execute("SELECT SUM(quantite) FROM ventes")
+    total_quantite = cursor.fetchone()[0] or 0
+    
+    conn.close()
+    
+    return total_ventes, total_quantite
+
 @app.route('/')
 def index():
     ventes = get_all_ventes()
-    return render_template('index.html', ventes=ventes)
+    total_ventes, total_quantite = get_totaux()
+    return render_template('index.html', ventes=ventes, total_ventes=total_ventes, total_quantite=total_quantite)
 
 @app.route('/ajouter', methods=['GET', 'POST'])
 def ajouter():
