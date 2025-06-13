@@ -136,15 +136,28 @@ def dashboard():
     ventes = get_all_ventes()
     
     # Les données pour les graphique
-    labels = []
-    quantites = []
+    labels_produits = []
+    quantites_produits = []
     
     for vente in ventes:
-        labels.append(vente['produit'])
-        quantites.append(vente['quantite'])
+        labels_produits.append(vente['produit'])
+        quantites_produits.append(vente['quantite'])
          
-    return render_template('dashboard.html', labels=labels, quantites=quantites)
-
+    # total quantité par client
+    client_totaux = {}
+    for vente in ventes:
+        client = vente['client']
+        quantite = vente['quantite']
+        if client in client_totaux:
+            client_totaux[client] += quantite
+        else:
+            client_totaux[client] = quantite
     
+    labels_clients = list(client_totaux.keys())
+    quantites_clients = list(client_totaux.values())
+    
+    return render_template('dashboard.html', labels=labels_produits, quantites=quantites_produits, labels_clients=labels_clients, quantites_clients=quantites_clients)
+
+        
 if __name__ == '__main__':
     app.run(debug=True)
