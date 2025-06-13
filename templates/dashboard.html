@@ -11,7 +11,13 @@
     <div class="container mt-5">
         <h1 class="text-center mb-4">📊 Dashboard des ventes</h1>
 
-        <canvas id="ventesChart" width="400" height="200"></canvas>
+        <!-- Histogramme produits -->
+        <h4>Quantités vendues par produit</h4>
+        <canvas id="ventesChart" height="100"></canvas>
+
+        <!-- Camembert clients -->
+        <h4 class="mt-5">Répartition des ventes par client</h4>
+        <canvas id="clientsChart" height="100"></canvas>
 
         <div class="mt-4 text-center">
             <a href="{{ url_for('index') }}" class="btn btn-secondary">🔙 Retour à la liste des ventes</a>
@@ -19,8 +25,9 @@
     </div>
 
     <script>
-        const ctx = document.getElementById('ventesChart').getContext('2d');
-        const ventesChart = new Chart(ctx, {
+        // Histogramme produit
+        const ctx1 = document.getElementById('ventesChart').getContext('2d');
+        const ventesChart = new Chart(ctx1, {
             type: 'bar',
             data: {
                 labels: {{ labels | safe }},
@@ -34,11 +41,27 @@
             },
             options: {
                 responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Camembert client
+        const ctx2 = document.getElementById('clientsChart').getContext('2d');
+        const clientsChart = new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: {{ labels_clients | safe }},
+                datasets: [{
+                    label: 'Ventes par client',
+                    data: {{ quantites_clients | safe }},
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                        '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true
             }
         });
     </script>
