@@ -131,5 +131,20 @@ def generer_excel():
     
     return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', as_attachment=True, download_name='rapport_ventes.xlsx')
 
+@app.route('/dashboard')
+def dashboard():
+    ventes = get_all_ventes()
+    
+    # Les données pour les graphique
+    labels = []
+    quantites = []
+    
+    for vente in ventes:
+        labels.append(vente['produit'])
+        quantites.append(vente['quantite'])
+         
+    return render_template('dashboard.html', labels=labels, quantites=quantites)
+
+    
 if __name__ == '__main__':
     app.run(debug=True)
