@@ -3,6 +3,8 @@ import sqlite3
 from xhtml2pdf import pisa
 from io import BytesIO
 import openpyxl
+from datetime import datetime
+
 
 app = Flask(__name__)
 
@@ -156,7 +158,19 @@ def dashboard():
     labels_clients = list(client_totaux.keys())
     quantites_clients = list(client_totaux.values())
     
-    return render_template('dashboard.html', labels=labels_produits, quantites=quantites_produits, labels_clients=labels_clients, quantites_clients=quantites_clients)
+    # Évolution par mois
+    ventes_par_mois = {}
+    
+    for vente in ventes:
+        date_obj = datetime.strptime(vente['date'], '%Y-%m-%d')
+        mois = date_obj.strftime('%Y-%m')
+        
+        ventes_par_mois[mois] = ventes_par_mois.get(mois, 0) + vente['quantite']
+        
+        labels_mois = sorted(ventes_par_mois.keys())
+        quantites_mois = [ventes_par_mois[mois] for mois in labels_mois]
+    
+    return render_template('dashboard.html', labels=labels_produits, quantites=quantites_produits, labels_clients=labels_clients, quantites_clients=quantites_clients, labels_mois=labels_mois, quantites_mois=quantites_mois)
 
         
 if __name__ == '__main__':

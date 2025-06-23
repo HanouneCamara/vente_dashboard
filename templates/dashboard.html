@@ -3,8 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard des ventes</title>
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Styles personnalisés -->
+    <style>
+        .graph-canvas {
+            max-width: 900px;
+            max-height: 800px;
+            width: 100%;
+            height: auto;
+            margin: 30px auto;
+            display: block;
+        }
+    </style>
 </head>
 <body>
 
@@ -12,20 +28,26 @@
         <h1 class="text-center mb-4">📊 Dashboard des ventes</h1>
 
         <!-- Histogramme produits -->
-        <h4>Quantités vendues par produit</h4>
-        <canvas id="ventesChart" height="100"></canvas>
+        <h4 class="text-center">Quantités vendues par produit</h4>
+        <canvas id="ventesChart" class="graph-canvas"></canvas>
 
         <!-- Camembert clients -->
-        <h4 class="mt-5">Répartition des ventes par client</h4>
-        <canvas id="clientsChart" height="100"></canvas>
+        <h4 class="text-center mt-5">Répartition des ventes par client</h4>
+        <canvas id="clientsChart" class="graph-canvas"></canvas>
 
-        <div class="mt-4 text-center">
+        <!-- Évolution des ventes -->
+        <h4 class="text-center mt-5">Évolution des ventes par mois</h4>
+        <canvas id="tempsChart" class="graph-canvas"></canvas>
+
+        <!-- Bouton retour -->
+        <div class="mt-5 text-center">
             <a href="{{ url_for('index') }}" class="btn btn-secondary">🔙 Retour à la liste des ventes</a>
         </div>
     </div>
 
+    <!-- Scripts des graphiques -->
     <script>
-        // Histogramme produit
+        // Histogramme produits
         const ctx1 = document.getElementById('ventesChart').getContext('2d');
         const ventesChart = new Chart(ctx1, {
             type: 'bar',
@@ -45,7 +67,7 @@
             }
         });
 
-        // Camembert client
+        // Camembert clients
         const ctx2 = document.getElementById('clientsChart').getContext('2d');
         const clientsChart = new Chart(ctx2, {
             type: 'pie',
@@ -56,12 +78,34 @@
                     data: {{ quantites_clients | safe }},
                     backgroundColor: [
                         '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-                        '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56'
+                        '#FF9F40', '#8B5CF6', '#F43F5E', '#14B8A6'
                     ]
                 }]
             },
             options: {
                 responsive: true
+            }
+        });
+
+        // Courbe temporelle
+        const ctx3 = document.getElementById('tempsChart').getContext('2d');
+        const tempsChart = new Chart(ctx3, {
+            type: 'line',
+            data: {
+                labels: {{ labels_mois | safe }},
+                datasets: [{
+                    label: 'Quantités vendues par mois',
+                    data: {{ quantites_mois | safe }},
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
             }
         });
     </script>
