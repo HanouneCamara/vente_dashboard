@@ -26,6 +26,41 @@
 
     <div class="container mt-5">
         <h1 class="text-center mb-4">📊 Dashboard des ventes</h1>
+        <!-- STATS -->
+        <div class="row text-center mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h6 class="card-title">🧾 Total des ventes</h6>
+                        <h4>{{ stats.total_ventes | round(2) }} €</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h6 class="card-title">📦 Quantité totale</h6>
+                        <h4>{{ stats.total_quantite }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h6 class="card-title">🏆 Produit top</h6>
+                        <h4>{{ stats.produit_nom }} ({{ stats.produit_total }})</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h6 class="card-title">🧍‍ Client fidèle</h6>
+                        <h4>{{ stats.client_nom }} ({{ stats.client_ventes }})</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Histogramme produits -->
         <h4 class="text-center">Quantités vendues par produit</h4>

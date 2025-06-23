@@ -133,6 +133,52 @@ def generer_excel():
     
     return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', as_attachment=True, download_name='rapport_ventes.xlsx')
 
+def get_stats():
+    conn = sqlite3.connect("db/ventes.db")
+    cursor = conn.cursor()
+    
+    # Total ventes
+    cursor.execute("SELECT SUM(quantite * prix_unitaire) FROM ventes")
+    total_ventes = cursor.fetchone()[0] or 0
+    
+    # Total quantité
+    cursor.execute("SELECT SUM(quantite) FROM ventes")
+    total_quantite = cursor.fetchone()[0] or 0
+    
+    # Meilleur client
+    cursor.execute(
+        """
+        SELECT client, COUNT(*) as ventes
+        FROM ventes
+        GROUP BY client
+        ORDER BY ventes DESC LIMIT 1
+    """)
+    best_client = cursor.fetchone()
+    client_nom = best_client[0] if best_client else "Aucun"
+    client_ventes = best_client[1] if best_client else 0
+    
+    # Produit le plus vendu
+    cursor.execute(
+        """
+        SELECT produit, SUM(quantite) as total
+        FROM ventes
+        GROUP BY produit
+        ORDER BY total DESC LIMIT 1 
+    """)
+    best_produit = cursor.fetchone()
+    produit_nom = best_produit[0] if best_produit else 0
+    produit_total = best_produit[1] if best_produit else 0
+    
+    conn.close()
+    return{
+        "total_ventes": total_ventes,
+        "total_quantite": total_quantite,
+        "client_nom": client_nom,
+        "client_ventes": client_ventes,
+        "produit_nom": produit_nom,
+        "produit_total": produit_total
+    }
+
 @app.route('/dashboard')
 def dashboard():
     ventes = get_all_ventes()
@@ -170,7 +216,8 @@ def dashboard():
         labels_mois = sorted(ventes_par_mois.keys())
         quantites_mois = [ventes_par_mois[mois] for mois in labels_mois]
     
-    return render_template('dashboard.html', labels=labels_produits, quantites=quantites_produits, labels_clients=labels_clients, quantites_clients=quantites_clients, labels_mois=labels_mois, quantites_mois=quantites_mois)
+    stats = get_stats()
+    return render_template('dashboard.html', labels=labels_produits, quantites=quantites_produits, labels_clients=labels_clients, quantites_clients=quantites_clients, labels_mois=labels_mois, quantites_mois=quantites_mois, stats=stats)
 
         
 if __name__ == '__main__':
