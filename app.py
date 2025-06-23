@@ -133,44 +133,52 @@ def generer_excel():
     
     return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', as_attachment=True, download_name='rapport_ventes.xlsx')
 
-def get_stats():
+def get_stats(mois=None, annee=None):
     conn = sqlite3.connect("db/ventes.db")
     cursor = conn.cursor()
-    
-    # Total ventes
-    cursor.execute("SELECT SUM(quantite * prix_unitaire) FROM ventes")
+
+    # Préparer les filtres SQL
+    condition = ""
+    params = []
+
+    if mois and annee:
+        condition = "WHERE strftime('%m', date) = ? AND strftime('%Y', date) = ?"
+        params = [f"{mois:02d}", str(annee)]
+
+    # Total des ventes (
+    cursor.execute(f"SELECT SUM(quantite * prix_unitaire) FROM ventes {condition}", params)
     total_ventes = cursor.fetchone()[0] or 0
-    
-    # Total quantité
-    cursor.execute("SELECT SUM(quantite) FROM ventes")
+
+    # Total des quantités
+    cursor.execute(f"SELECT SUM(quantite) FROM ventes {condition}", params)
     total_quantite = cursor.fetchone()[0] or 0
-    
+
     # Meilleur client
-    cursor.execute(
-        """
+    cursor.execute(f"""
         SELECT client, COUNT(*) as ventes
         FROM ventes
+        {condition}
         GROUP BY client
         ORDER BY ventes DESC LIMIT 1
-    """)
+    """, params)
     best_client = cursor.fetchone()
     client_nom = best_client[0] if best_client else "Aucun"
     client_ventes = best_client[1] if best_client else 0
-    
+
     # Produit le plus vendu
-    cursor.execute(
-        """
+    cursor.execute(f"""
         SELECT produit, SUM(quantite) as total
         FROM ventes
+        {condition}
         GROUP BY produit
         ORDER BY total DESC LIMIT 1 
-    """)
+    """, params)
     best_produit = cursor.fetchone()
-    produit_nom = best_produit[0] if best_produit else 0
+    produit_nom = best_produit[0] if best_produit else "Aucun"
     produit_total = best_produit[1] if best_produit else 0
-    
+
     conn.close()
-    return{
+    return {
         "total_ventes": total_ventes,
         "total_quantite": total_quantite,
         "client_nom": client_nom,
@@ -181,44 +189,69 @@ def get_stats():
 
 @app.route('/dashboard')
 def dashboard():
-    ventes = get_all_ventes()
-    
-    # Les données pour les graphique
-    labels_produits = []
-    quantites_produits = []
-    
+    # Récupération des filtres depuis l'URL
+    mois = request.args.get('mois', type=int)
+    annee = request.args.get('annee', type=int)
+
+    # Connexion à la base
+    conn = sqlite3.connect("db/ventes.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # Conditions SQL selon les filtres
+    condition = ""
+    params = []
+
+    if mois and annee:
+        condition = "WHERE strftime('%m', date) = ? AND strftime('%Y', date) = ?"
+        params = [f"{mois:02d}", str(annee)]
+
+    # Récupération des ventes filtrées
+    cursor.execute(f"SELECT * FROM ventes {condition}", params)
+    ventes = cursor.fetchall()
+    conn.close()
+
+    # Données pour l’histogramme par produit
+    produit_totaux = {}
     for vente in ventes:
-        labels_produits.append(vente['produit'])
-        quantites_produits.append(vente['quantite'])
-         
-    # total quantité par client
+        produit = vente["produit"]
+        produit_totaux[produit] = produit_totaux.get(produit, 0) + vente["quantite"]
+    labels_produits = list(produit_totaux.keys())
+    quantites_produits = list(produit_totaux.values())
+
+    # Données pour le camembert par client
     client_totaux = {}
     for vente in ventes:
-        client = vente['client']
-        quantite = vente['quantite']
-        if client in client_totaux:
-            client_totaux[client] += quantite
-        else:
-            client_totaux[client] = quantite
-    
+        client = vente["client"]
+        client_totaux[client] = client_totaux.get(client, 0) + vente["quantite"]
     labels_clients = list(client_totaux.keys())
     quantites_clients = list(client_totaux.values())
-    
-    # Évolution par mois
-    ventes_par_mois = {}
-    
-    for vente in ventes:
-        date_obj = datetime.strptime(vente['date'], '%Y-%m-%d')
-        mois = date_obj.strftime('%Y-%m')
-        
-        ventes_par_mois[mois] = ventes_par_mois.get(mois, 0) + vente['quantite']
-        
-        labels_mois = sorted(ventes_par_mois.keys())
-        quantites_mois = [ventes_par_mois[mois] for mois in labels_mois]
-    
-    stats = get_stats()
-    return render_template('dashboard.html', labels=labels_produits, quantites=quantites_produits, labels_clients=labels_clients, quantites_clients=quantites_clients, labels_mois=labels_mois, quantites_mois=quantites_mois, stats=stats)
 
+    # Évolution des ventes par mois 
+    toutes_ventes = get_all_ventes()
+    ventes_par_mois = {}
+    for vente in toutes_ventes:
+        date_obj = datetime.strptime(vente['date'], '%Y-%m-%d')
+        mois_annee = date_obj.strftime('%Y-%m')
+        ventes_par_mois[mois_annee] = ventes_par_mois.get(mois_annee, 0) + vente['quantite']
+    labels_mois = sorted(ventes_par_mois.keys())
+    quantites_mois = [ventes_par_mois[m] for m in labels_mois]
+
+    # Statistiques générales
+    stats = get_stats(mois, annee)
+
+    return render_template(
+        'dashboard.html',
+        labels=labels_produits,
+        quantites=quantites_produits,
+        labels_clients=labels_clients,
+        quantites_clients=quantites_clients,
+        labels_mois=labels_mois,
+        quantites_mois=quantites_mois,
+        stats=stats,
+        mois_selected=mois,
+        annee_selected=annee
+    )
         
 if __name__ == '__main__':
     app.run(debug=True)

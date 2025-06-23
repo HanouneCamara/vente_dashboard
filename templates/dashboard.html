@@ -26,6 +26,30 @@
 
     <div class="container mt-5">
         <h1 class="text-center mb-4">📊 Dashboard des ventes</h1>
+        <!-- From filtre -->
+        <form method="GET" class="row g-2 justify-content-center mb-4">
+            <div class="col-md-3">
+                <select name="mois" class="form-select">
+                    <option value="">📅 Mois</option>
+                    {% for i in range(1, 13) %}
+                        <option value="{{ i }}" {% if mois_selected == i %}selected{% endif %}>{{ '%02d' % i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="annee" class="form-select">
+                    <option value="">📆 Année</option>
+                    {% for y in range(2023, 2031) %}
+                        <option value="{{ y }}" {% if annee_selected == y %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">🔍 Filtrer</button>
+            </div>
+        </form>
+
+
         <!-- STATS -->
         <div class="row text-center mb-4">
             <div class="col-md-3 mb-3">
@@ -61,6 +85,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- Histogramme produits -->
         <h4 class="text-center">Quantités vendues par produit</h4>
